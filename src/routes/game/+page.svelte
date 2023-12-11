@@ -35,15 +35,18 @@
 	};
 
 	const getGameDetails = async () => {
+		loading = true;
 		await pb
 			.collection('games')
 			.getOne('ufjlzc9c6zj8q40')
 			.then((res) => {
 				game = res;
+				loading = false;
 			});
 	};
 
 	const getTeamDetails = async () => {
+		loading = true;
 		await pb
 			.collection('teams')
 			.getFullList({
@@ -55,25 +58,19 @@
 				await pb.collection('teams').subscribe(res[0].id, ({ record }) => {
 					team = record;
 				});
-				// if (checkPoints(team.points, team.members.length)) {
-				// 	await pb.collection('teams').update(team.id, {
-				// 		locked: true
-				// 	});
-				// } else {
-				// 	await pb.collection('users').update($page.data.user.id, {
-				// 		waiting: true
-				// 	});
-				// }
+				loading = false;
 			});
 	};
 
 	const getQuestion = async () => {
+		loading = true;
 		await pb
 			.collection('questions')
 			.getFullList({ filter: `users ~ '${$page.data.user.id}'` })
 			.then(async (res) => {
 				if (res.length !== 0) {
 					question = res[0];
+					loading = false;
 				} else if (res.length === 0) {
 					await pb
 						.collection('questions')
@@ -87,6 +84,7 @@
 								})
 								.then((res) => {
 									question = res;
+									loading = false;
 								});
 						});
 				}
@@ -102,25 +100,32 @@
 					'users-': $page.data.user.id
 				})
 				.then(async (res) => {
-					await pb.collection('teams').update(team.id, {
-						points: team.points + 1
-					});
-					console.log({
-						points: team.points,
-						members: team.members.length,
-						status: checkPoints(team.points, team.members.length)
-					});
-					if (checkPoints(team.points, team.members.length) && !team.solvedRecently) {
-						await pb.collection('teams').update(team.id, {
-							locked: true,
-							solvedRecently: false
+					await pb
+						.collection('teams')
+						.update(team.id, {
+							'points+': 1
+						})
+						.then(async (updatedRes) => {
+							console.log({
+								points: updatedRes.points,
+								members: team.members.length,
+								status: checkPoints(updatedRes.points, team.members.length)
+							});
+							if (checkPoints(updatedRes.points, team.members.length) && !team.solvedRecently) {
+								await pb
+									.collection('teams')
+									.update(team.id, {
+										locked: true,
+										solvedRecently: false
+									})
+									.then(async (res) => {
+										await pb.collection('users').update($page.data.user.id, {
+											waiting: true
+										});
+										loadingSubmit = false;
+									});
+							}
 						});
-					} else {
-						await pb.collection('users').update($page.data.user.id, {
-							waiting: true
-						});
-					}
-					loadingSubmit = false;
 				});
 		}
 	};
@@ -176,50 +181,6 @@
 			>
 		</Block>
 	{/if}
-{:else}
-	<Preloader />
+{:else if loading}
+	<Block class="flex justify-center"><Preloader /></Block>
 {/if}
-
-<!-- {#if !loading && game && question}
-	{#if !game.started}
-		<Card class="items-center flex flex-col" header="Waiting for the host to start...">
-			<Preloader />
-		</Card>
-	{:else}
-		<BlockTitle>Team Solved Questions {team ? team.points : 0} / 30</BlockTitle>
-		<Block></Block>
-		{#if team && team.locked && !team.solvedRecently}
-			<Card header="Guess the location, find the QR and scan to proceed.">
-				<Scanner teamId={team.id} />
-			</Card>
-		{:else if team && user && !team.locked && user.waiting}
-			<Card class="flex justify-center"
-				><div class="flex justify-center items-center space-x-4">
-					<div>Waiting for other members to solve...</div>
-					<div class="w-fit h-fit flex"><Preloader size="w-8 h-8" /></div>
-				</div></Card
-			>
-		{:else if team && user && !team.locked && team.solvedRecently && !user.waiting}
-			<Card>{question.question} ?</Card>
-			{#if answer && answer !== null && answer !== undefined}
-				<Block>
-					<p class="text-center uppercase text-xl text-blue-500 font-bold">{answer}</p>
-				</Block>
-			{/if}
-			<Block>
-				<InputBox bind:values={answer} numberOfInputs={question.answer.length} />
-			</Block>
-			<Block>
-				<Button large onClick={handleSubmit}>
-					{#if loadingSubmit}
-						<Preloader size="w-4 h-4 text-white" />
-					{:else}
-						Confirm
-					{/if}</Button
-				>
-			</Block>
-		{/if}
-	{/if}
-{:else}
-	<Preloader />
-{/if} -->
