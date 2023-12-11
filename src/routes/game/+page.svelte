@@ -112,19 +112,15 @@
 								status: checkPoints(updatedRes.points, team.members.length)
 							});
 							if (checkPoints(updatedRes.points, team.members.length) && !team.solvedRecently) {
-								await pb
-									.collection('teams')
-									.update(team.id, {
-										locked: true,
-										solvedRecently: false
-									})
-									.then(async (res) => {
-										await pb.collection('users').update($page.data.user.id, {
-											waiting: true
-										});
-										loadingSubmit = false;
-									});
+								await pb.collection('teams').update(team.id, {
+									locked: true,
+									solvedRecently: false
+								});
 							}
+							await pb.collection('users').update($page.data.user.id, {
+								waiting: true
+							});
+							loadingSubmit = false;
 						});
 				});
 		}
