@@ -2,6 +2,7 @@
 	import { Html5Qrcode } from 'html5-qrcode';
 	import { onMount } from 'svelte';
 	import pb from '../pb';
+	import { page } from '$app/stores';
 
 	function getRandom(int: number) {
 		return Math.floor(Math.random() * int);
@@ -29,7 +30,7 @@
 			.then(async (res) => {
 				if (res.length !== 0) {
 					location = res[0];
-				} else if (res.length === 0) {
+				} else if (res.length === 0 && $page.data.user.leader) {
 					await pb
 						.collection('locations')
 						.getFullList()
