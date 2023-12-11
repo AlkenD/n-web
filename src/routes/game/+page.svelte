@@ -5,6 +5,7 @@
 	import { Block, BlockTitle, Button, Card, Preloader } from 'konsta/svelte';
 	import InputBox from '$lib/InputBox.svelte';
 	import Scanner from '$lib/Scanner.svelte';
+	import { goto } from '$app/navigation';
 
 	function getRandom(int: number) {
 		return Math.floor(Math.random() * int);
@@ -21,6 +22,10 @@
 	let user: any;
 	let question: any;
 	let answer: string;
+
+	$: if (game && game.winner !== '') {
+		goto('/winner');
+	}
 
 	const getUserDetails = async () => {
 		await pb

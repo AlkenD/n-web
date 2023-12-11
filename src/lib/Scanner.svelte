@@ -27,6 +27,11 @@
 					solvedRecently: true
 				})
 				.then(async (res) => {
+					if (res.points === 30) {
+						await pb.collection('games').update('ufjlzc9c6zj8q40', {
+							winner: teamId
+						});
+					}
 					await pb
 						.collection('locations')
 						.update(location.id, {
