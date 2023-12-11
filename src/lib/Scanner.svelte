@@ -23,10 +23,11 @@
 			.getOne(value)
 			.then((res) => {
 				alert('Success');
-				scanner.stop();
 			})
 			.catch((err) => {
 				alert('Failed');
+			})
+			.finally(() => {
 				scanner.stop();
 			});
 	};
