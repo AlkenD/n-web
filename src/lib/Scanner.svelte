@@ -19,12 +19,42 @@
 
 	const handleScanQr = async (value: string) => {
 		if (value === location.id) {
-			alert('Success');
+			pb.collection('teams')
+				.update(teamId, {
+					locked: false
+				})
+				.then((res) => {
+					pb.collection('locations').update(location.id, {
+						'teams-': teamId
+					});
+				});
+			refreshTeamMembers();
 			scanner.stop();
 		} else {
-			alert('Failed');
+			alert('Invalid QR Code. Try again');
 			scanner.stop();
 		}
+	};
+
+	const refreshTeamMembers = async () => {
+		pb.collection('teams')
+			.getOne(teamId, {
+				expand: 'members'
+			})
+			.then(async (res) => {
+				const members = res.expand?.members;
+				for (const member of members) {
+					try {
+						const memberId = member.id;
+						await pb.collection('users').update(memberId, {
+							waiting: false
+						});
+						console.log(`Member ${memberId} updated successfully.`);
+					} catch (updateError) {
+						console.error(`Error updating member ${member.id}:`, updateError);
+					}
+				}
+			});
 	};
 
 	const getCurrentLocation = async () => {
