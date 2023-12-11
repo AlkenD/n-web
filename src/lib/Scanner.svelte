@@ -19,6 +19,7 @@
 
 	const handleScanQr = async (value: string) => {
 		if (value === location.id) {
+			refreshTeamMembers();
 			pb.collection('teams')
 				.update(teamId, {
 					locked: false,
@@ -29,7 +30,6 @@
 						'teams-': teamId
 					});
 				});
-			refreshTeamMembers();
 			scanner.stop();
 		} else {
 			alert('Invalid QR Code. Try again');

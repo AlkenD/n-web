@@ -111,7 +111,7 @@
 								members: team.members.length,
 								status: checkPoints(updatedRes.points, team.members.length)
 							});
-							if (checkPoints(updatedRes.points, team.members.length) && !team.solvedRecently) {
+							if (checkPoints(updatedRes.points, team.members.length)) {
 								await pb.collection('teams').update(team.id, {
 									locked: true,
 									solvedRecently: false
