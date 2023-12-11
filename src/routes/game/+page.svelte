@@ -55,15 +55,15 @@
 				await pb.collection('teams').subscribe(res[0].id, ({ record }) => {
 					team = record;
 				});
-				if (checkPoints(team.points, team.members.length)) {
-					await pb.collection('teams').update(team.id, {
-						locked: true
-					});
-				} else {
-					await pb.collection('users').update($page.data.user.id, {
-						waiting: true
-					});
-				}
+				// if (checkPoints(team.points, team.members.length)) {
+				// 	await pb.collection('teams').update(team.id, {
+				// 		locked: true
+				// 	});
+				// } else {
+				// 	await pb.collection('users').update($page.data.user.id, {
+				// 		waiting: true
+				// 	});
+				// }
 			});
 	};
 
@@ -103,8 +103,7 @@
 				})
 				.then(async (res) => {
 					await pb.collection('teams').update(team.id, {
-						points: team.points + 1,
-						solvedRecently: false
+						points: team.points + 1
 					});
 					console.log({
 						points: team.points,
@@ -113,7 +112,8 @@
 					});
 					if (checkPoints(team.points, team.members.length) && !team.solvedRecently) {
 						await pb.collection('teams').update(team.id, {
-							locked: true
+							locked: true,
+							solvedRecently: false
 						});
 					} else {
 						await pb.collection('users').update($page.data.user.id, {
@@ -137,7 +137,50 @@
 	});
 </script>
 
-{#if !loading && game && question}
+{#if game && game.started && team && question && user}
+	<BlockTitle>Team Solved Questions {team ? team.points : 0} / 30</BlockTitle>
+	<Block></Block>
+	{#if user.waiting && !team.locked}
+		<Card class="flex justify-center"
+			><div class="flex justify-center items-center space-x-4">
+				<div>Waiting for other members to solve...</div>
+				<div class="w-fit h-fit flex"><Preloader size="w-8 h-8" /></div>
+			</div></Card
+		>
+	{:else if user.waiting && team.locked && !team.solvedRecently}
+		<Card header="Guess the location, find the QR and scan to proceed.">
+			<Scanner teamId={team.id} />
+		</Card>
+	{/if}
+	{#if !game.started}
+		<Card class="items-center flex flex-col" header="Waiting for the host to start...">
+			<Preloader />
+		</Card>
+	{:else if (!team.locked || team.solvedRecently) && !user.waiting}
+		<Card>{question.question} ?</Card>
+		{#if answer && answer !== null && answer !== undefined}
+			<Block>
+				<p class="text-center uppercase text-xl text-blue-500 font-bold">{answer}</p>
+			</Block>
+		{/if}
+		<Block>
+			<InputBox bind:values={answer} numberOfInputs={question.answer.length} />
+		</Block>
+		<Block>
+			<Button large onClick={handleSubmit}>
+				{#if loadingSubmit}
+					<Preloader size="w-4 h-4 text-white" />
+				{:else}
+					Confirm
+				{/if}</Button
+			>
+		</Block>
+	{/if}
+{:else}
+	<Preloader />
+{/if}
+
+<!-- {#if !loading && game && question}
 	{#if !game.started}
 		<Card class="items-center flex flex-col" header="Waiting for the host to start...">
 			<Preloader />
@@ -145,7 +188,7 @@
 	{:else}
 		<BlockTitle>Team Solved Questions {team ? team.points : 0} / 30</BlockTitle>
 		<Block></Block>
-		{#if team && team.locked}
+		{#if team && team.locked && !team.solvedRecently}
 			<Card header="Guess the location, find the QR and scan to proceed.">
 				<Scanner teamId={team.id} />
 			</Card>
@@ -156,7 +199,7 @@
 					<div class="w-fit h-fit flex"><Preloader size="w-8 h-8" /></div>
 				</div></Card
 			>
-		{:else if team && user && (!team.locked || team.solvedRecently) && !user.waiting}
+		{:else if team && user && !team.locked && team.solvedRecently && !user.waiting}
 			<Card>{question.question} ?</Card>
 			{#if answer && answer !== null && answer !== undefined}
 				<Block>
@@ -179,4 +222,4 @@
 	{/if}
 {:else}
 	<Preloader />
-{/if}
+{/if} -->
