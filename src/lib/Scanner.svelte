@@ -20,15 +20,21 @@
 	const handleScanQr = async (value: string) => {
 		if (value === location.id) {
 			await refreshTeamMembers();
-			pb.collection('teams')
+			await pb
+				.collection('teams')
 				.update(teamId, {
 					locked: false,
 					solvedRecently: true
 				})
-				.then((res) => {
-					pb.collection('locations').update(location.id, {
-						'teams-': teamId
-					});
+				.then(async (res) => {
+					await pb
+						.collection('locations')
+						.update(location.id, {
+							'teams-': teamId
+						})
+						.then((res) => {
+							window.location.reload();
+						});
 				});
 			scanner.stop();
 		} else {
