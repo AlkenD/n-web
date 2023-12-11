@@ -182,6 +182,6 @@
 			>
 		</Block>
 	{/if}
-{:else if loading}
+{:else}
 	<Block class="flex justify-center"><Preloader /></Block>
 {/if}
