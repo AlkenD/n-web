@@ -1,5 +1,5 @@
 const localEnv = {
-	PUBLIC_SERVER: 'http://45.79.121.50'
+	PUBLIC_SERVER: 'https://dester.in'
 };
 
 export default localEnv;

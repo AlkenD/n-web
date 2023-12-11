@@ -5,6 +5,13 @@ export const actions = {
 		const data = await request.formData();
 		const username = data.get('username');
 		const password = data.get('password');
-		await locals.pb.collection('users').authWithPassword(username, password);
+		await locals.pb
+			.collection('users')
+			.authWithPassword(username, password)
+			.then((res) => {
+			})
+			.catch((err) => {
+				console.log(err);
+			});
 	}
 } satisfies Actions;
