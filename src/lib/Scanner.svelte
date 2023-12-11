@@ -20,8 +20,10 @@
 	const handleScanQr = async (value: string) => {
 		if (value === location.id) {
 			alert('Success');
+			scanner.stop();
 		} else {
 			alert('Failed');
+			scanner.stop();
 		}
 	};
 
