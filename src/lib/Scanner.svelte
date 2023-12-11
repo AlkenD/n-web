@@ -74,7 +74,7 @@
 			.then(async (res) => {
 				if (res.length !== 0) {
 					location = res[0];
-					pb.collection('games').subscribe(res[0].id, ({ record }) => {
+					pb.collection('locations').subscribe(res[0].id, ({ record }) => {
 						location = record;
 					});
 				} else if (res.length === 0 && $page.data.user.leader) {
