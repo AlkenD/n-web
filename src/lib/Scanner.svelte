@@ -37,8 +37,21 @@
 						.update(location.id, {
 							'teams-': teamId
 						})
-						.then((res) => {
-							window.location.reload();
+						.then(async (res) => {
+							await pb
+								.collection('questions')
+								.getFullList()
+								.then(async (res) => {
+									const randomQuestion = res[getRandom(res.length)];
+									await pb
+										.collection('questions')
+										.update(randomQuestion.id, {
+											users: $page.data.user.id
+										})
+										.then((res) => {
+											window.location.reload();
+										});
+								});
 						});
 				});
 			scanner.stop();
