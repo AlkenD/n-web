@@ -103,14 +103,15 @@
 				})
 				.then(async (res) => {
 					await pb.collection('teams').update(team.id, {
-						points: team.points + 1
+						points: team.points + 1,
+						solvedRecently: false
 					});
 					console.log({
 						points: team.points,
 						members: team.members.length,
 						status: checkPoints(team.points, team.members.length)
 					});
-					if (checkPoints(team.points, team.members.length)) {
+					if (checkPoints(team.points, team.members.length) && !team.solvedRecently) {
 						await pb.collection('teams').update(team.id, {
 							locked: true
 						});

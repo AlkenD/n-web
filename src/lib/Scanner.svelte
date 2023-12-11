@@ -21,7 +21,8 @@
 		if (value === location.id) {
 			pb.collection('teams')
 				.update(teamId, {
-					locked: false
+					locked: false,
+					solvedRecently: true
 				})
 				.then((res) => {
 					pb.collection('locations').update(location.id, {
