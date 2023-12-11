@@ -90,6 +90,9 @@
 								})
 								.then((res) => {
 									location = res;
+									pb.collection('locations').subscribe(res.id, ({ record }) => {
+										location = record;
+									});
 								});
 						});
 				}
