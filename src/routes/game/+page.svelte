@@ -55,6 +55,15 @@
 				await pb.collection('teams').subscribe(res[0].id, ({ record }) => {
 					team = record;
 				});
+				if (checkPoints(team.points, team.members.length)) {
+					await pb.collection('teams').update(team.id, {
+						locked: true
+					});
+				} else {
+					await pb.collection('users').update($page.data.user.id, {
+						waiting: true
+					});
+				}
 			});
 	};
 
@@ -93,28 +102,24 @@
 					'users-': $page.data.user.id
 				})
 				.then(async (res) => {
-					await pb
-						.collection('teams')
-						.update(team.id, {
-							points: team.points + 1
-						})
-						.then(async (res) => {
-							console.log({
-								points: team.points,
-								members: team.members.length,
-								status: checkPoints(team.points, team.members.length)
-							});
-							if (checkPoints(team.points, team.members.length)) {
-								await pb.collection('teams').update(team.id, {
-									locked: true
-								});
-							} else {
-								await pb.collection('users').update($page.data.user.id, {
-									waiting: true
-								});
-							}
-							loadingSubmit = false;
+					await pb.collection('teams').update(team.id, {
+						points: team.points + 1
+					});
+					console.log({
+						points: team.points,
+						members: team.members.length,
+						status: checkPoints(team.points, team.members.length)
+					});
+					if (checkPoints(team.points, team.members.length)) {
+						await pb.collection('teams').update(team.id, {
+							locked: true
 						});
+					} else {
+						await pb.collection('users').update($page.data.user.id, {
+							waiting: true
+						});
+					}
+					loadingSubmit = false;
 				});
 		}
 	};
