@@ -18,18 +18,11 @@
 	let location: any;
 
 	const handleScanQr = async (value: string) => {
-		await pb
-			.collection('locations')
-			.getOne(value)
-			.then((res) => {
-				alert('Success');
-			})
-			.catch((err) => {
-				alert('Failed');
-			})
-			.finally(() => {
-				scanner.stop();
-			});
+		if (value === location.id) {
+			alert('Success');
+		} else {
+			alert('Failed');
+		}
 	};
 
 	const getCurrentLocation = async () => {
