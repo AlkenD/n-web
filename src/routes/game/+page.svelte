@@ -145,7 +145,7 @@
 	{:else}
 		<BlockTitle>Team Solved Questions {team ? team.points : 0} / 30</BlockTitle>
 		<Block></Block>
-		{#if team && team.locked}
+		{#if team && team.locked && !team.solvedRecently}
 			<Card header="Guess the location, find the QR and scan to proceed.">
 				<Scanner teamId={team.id} />
 			</Card>
