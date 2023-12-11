@@ -19,7 +19,7 @@
 
 	const handleScanQr = async (value: string) => {
 		if (value === location.id) {
-			refreshTeamMembers();
+			await refreshTeamMembers();
 			pb.collection('teams')
 				.update(teamId, {
 					locked: false,
@@ -38,7 +38,8 @@
 	};
 
 	const refreshTeamMembers = async () => {
-		pb.collection('teams')
+		await pb
+			.collection('teams')
 			.getOne(teamId, {
 				expand: 'members'
 			})
