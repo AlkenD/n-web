@@ -156,7 +156,7 @@
 					<div class="w-fit h-fit flex"><Preloader size="w-8 h-8" /></div>
 				</div></Card
 			>
-		{:else if team && user && !team.locked && !user.waiting}
+		{:else if team && user && (!team.locked || team.solvedRecently) && !user.waiting}
 			<Card>{question.question} ?</Card>
 			{#if answer && answer !== null && answer !== undefined}
 				<Block>
